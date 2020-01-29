@@ -1,0 +1,13 @@
+/* 추가 클래스 */
+
+/* contents */
+.contents {
+    display: flex;
+}
+
+.contents-item {
+    /* background-color: green; */
+    /* width: 400px;
+    height: 0px; */
+    margin: 5px;
+}
