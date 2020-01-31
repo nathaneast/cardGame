@@ -1,20 +1,32 @@
+body {
+    margin: 0px;
+}
+
+/* head */
+.head > h1 {
+    text-align: center;
+}
 
 /* contents */
 .contents {
-    display: flex;
-    flex-wrap : wrap;
+    display: grid;
+    grid-template-columns: repeat(4, 120px);
+    grid-template-rows: repeat(3, 150px);
+    justify-content: center;
 }
 
-.contents > div {
-    margin: 5px;
-}
-
-.contents > div > img {
+.imgItem {
     width: 120px;
-    height: 180px;
+    height: 150px;
+    border: .7px solid black;
 }
 
 /* playGame */
 .playGame {
     display: flex;
+    justify-content: center;
+}
+
+.playGame > div {
+    margin: 10px;
 }

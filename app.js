@@ -28,8 +28,8 @@ function endGame(endStatus) {
     endPromise.then(() => {
         realLife = 3;
         realClearCount = 0;
-        life.innerText = `life: ${realLife}`;
-        clearCount.innerText = `Clear: ${realClearCount}`;
+        life.innerText = `LIFE: ${realLife}`;
+        clearCount.innerText = `CLEAR: ${realClearCount}`;
         statusMessage.innerText = "시작 버튼을 누르세요 ! ";
 
         startBtn.addEventListener("click", startGame);
@@ -54,7 +54,7 @@ function matchingImg(target) {
             realClearCount++;
             statusMessage.innerText = "정답 입니다 !";
 
-            clearCount.innerText = `Clear: ${realClearCount}`;
+            clearCount.innerText = `CLEAR: ${realClearCount}`;
 
             target.src = `img/${currentKey}.png`;
             target.classList.remove("haveImgEvt");
@@ -65,19 +65,16 @@ function matchingImg(target) {
             beforeKey = null;
 
             if (realClearCount === contentsList.length / 2) {
-                console.log("game clear");
                 endGame(true);
             }
         } else {
             realLife--;
             statusMessage.innerText = "틀렸습니다 ! -1";
-            life.innerText = `life: ${realLife}`;
-            console.log(target);
+            life.innerText = `LIFE: ${realLife}`;
             target.src = `img/${currentKey}.png`;
             keyStorEvtHandler(false);
 
             if (!realLife) {
-                console.log("game over");
                 endGame(false);
                 return;
             }
@@ -193,8 +190,8 @@ function startGame() {
     const randomNumArr = selectRandomNum();
     startBtn.removeEventListener("click", startGame);
     
-    life.innerText = `life: ${realLife}`;
-    clearCount.innerText = `Clear: ${realClearCount}`;
+    life.innerText = `LIFE: ${realLife}`;
+    clearCount.innerText = `CLEAR: ${realClearCount}`;
 
     viewEveryImg(randomNumArr);
     pushKeyStorage(randomNumArr);
