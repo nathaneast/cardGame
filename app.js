@@ -2,13 +2,40 @@ const contents = document.querySelector(".contents");
 const contentsList = contents.querySelectorAll("div");
 const startBtn = document.querySelector(".startBtn");
 const life = document.querySelector(".life");
-const clearImgCount = document.querySelector(".clearImgCount");
+const clearCount = document.querySelector(".clearCount");
 const statusMessage = document.querySelector(".statusMessage");
 
 const KeyStorage = {};
 let beforeKey;
-let realLife = 1;
+let realLife = 3;
 let realClearCount = 0;
+
+function endGame(endStatus) {
+    const endPromise = new Promise(resolve => {
+        setTimeout(() => {
+            if (endStatus) {
+                alert("GAME CLEAR");
+
+            } else {
+                alert("GAME OVER");
+                keyStorEvtHandler(false);
+                beforeKey = null;
+            }
+            resolve();
+        }, 1);
+    });
+
+    endPromise.then(() => {
+        realLife = 3;
+        realClearCount = 0;
+        life.innerText = `life: ${realLife}`;
+        clearCount.innerText = `Clear: ${realClearCount}`;
+        statusMessage.innerText = "시작 버튼을 누르세요 ! ";
+
+        startBtn.addEventListener("click", startGame);
+        viewImgDefault(false);
+    });
+}
 
 function matchingImg(target) {
     let currentKey;
@@ -25,7 +52,9 @@ function matchingImg(target) {
     if (beforeKey) {
         if (currentKey === beforeKey[1]) {
             realClearCount++;
-            clearImgCount.innerText = `Clear: ${realClearCount}`;
+            statusMessage.innerText = "정답 입니다 !";
+
+            clearCount.innerText = `Clear: ${realClearCount}`;
 
             target.src = `img/${currentKey}.png`;
             target.classList.remove("haveImgEvt");
@@ -37,67 +66,52 @@ function matchingImg(target) {
 
             if (realClearCount === contentsList.length / 2) {
                 console.log("game clear");
+                endGame(true);
             }
         } else {
             realLife--;
+            statusMessage.innerText = "틀렸습니다 ! -1";
             life.innerText = `life: ${realLife}`;
+            console.log(target);
+            target.src = `img/${currentKey}.png`;
+            keyStorEvtHandler(false);
 
             if (!realLife) {
                 console.log("game over");
+                endGame(false);
+                return;
             }
 
-            target.src = `img/${currentKey}.png`;
-            // console.log(KeyStorage);
-            Object.keys(KeyStorage).forEach(div => {
-                contentsList[div].firstChild.classList.remove("haveImgEvt");
-            });
-            
             setTimeout(() => {
-                Object.keys(KeyStorage).forEach(div => {
-                    contentsList[div].firstChild.classList.add("haveImgEvt");
-                });
+                keyStorEvtHandler(true);
 
                 target.src = `img/${0}.png`;
                 contentsList[beforeKey[0]].firstChild.src = `img/${0}.png`;
-
                 beforeKey = null;
-            }, 3000);
+                statusMessage.innerText = "똑같은 카드를 고르세요 !";
 
-
-
- 
-
+            }, 1000);
 
         }
     } else {
+        statusMessage.innerText = "똑같은 카드를 고르세요 !";
+
         beforeKey = [targetIndex, currentKey];
         target.src = `img/${currentKey}.png`;
         target.classList.remove("haveImgEvt");
     }
+}
 
-
-    // 처음누름 => 비포키에 인덱스 ,키 담기
-    // 이미지변경, 이벤트 제거
-    
-
-    // 두번쨰누름 
-    // 맞음
-    // 클리어카운트 +
-    // 클리어카운트 = 컨텐츠리스트 길이 같으면 => 게임클리어
-    // 타겟키 저장소 키값으로 사진 바꾸고
-    // 키저장소에서 비포키 인덱스값 키 , 타겟키 지우기
-    // 비포키 null
-    // 이벤트지우기
-    
-    //틀림
-    // 리얼라이프 -1
-    // 리얼라이프 0 => 게임오버
-    // 타겟인덱스 => 키값 이미지로 바꾸기
-    // 모든 이벤트제거
-    // 1초후에 타겟키 모든이벤트 생성
-    // 비포키 null
-    // 타겟키, 비포키 0 화면ㅇ로 바꾸기
-
+function keyStorEvtHandler(hasStatus) {
+    if (hasStatus) {
+        Object.keys(KeyStorage).forEach(div => {
+            contentsList[div].firstChild.classList.add("haveImgEvt");
+        });
+    } else {
+        Object.keys(KeyStorage).forEach(div => {
+            contentsList[div].firstChild.classList.remove("haveImgEvt");
+        });
+    }
 }
 
 function addEventImg() {
@@ -114,18 +128,26 @@ function addEventImg() {
     });
 }
 
-function viewImgDefault() {
-    return new Promise( resolve => {
-        setTimeout(() => {
-            contentsList.forEach( item => {
-                item.firstChild.src = `img/${0}.png`;
-            });
-            resolve();
-        } ,1000);
-    });
+function viewImgDefault(hasStart) {
+    if (hasStart) {
+        return new Promise(resolve => {
+            setTimeout(() => {
+                statusMessage.innerText = "게임 시작 !";
+                contentsList.forEach(div => {
+                    div.firstChild.src = "img/0.png";
+                });
+                resolve();
+            }, 3000);
+        });
+    } else {
+        contentsList.forEach(div => {
+            div.firstChild.src = "img/0.png";
+        });
+    }
 }
 
 function viewEveryImg(ranNum) {
+    statusMessage.innerText = "3초만 보여집니다 !";
     ranNum.forEach( (item, index) => {
         contentsList[index].firstChild.src = `img/${item}.png`;
     });
@@ -143,15 +165,15 @@ function selectRandomNum() {
     const numArr = [];
     const numUse = {
         1: 0,
-        2: 0
-        // 3: 0,
-        // 4: 0,
-        // 5: 0,
-        // 6: 0
+        2: 0,
+        3: 0,
+        4: 0,
+        5: 0,
+        6: 0
     }
 
     while (hasCountinue) {
-        const randomNum = Math.floor(Math.random() * 2) + 1;
+        const randomNum = Math.floor(Math.random() * 6) + 1;
 
         if (numUse[randomNum] < 2) {
             numUse[randomNum] += 1;
@@ -159,7 +181,7 @@ function selectRandomNum() {
             count++;
         }
 
-        if (count === 4) {
+        if (count === 12) {
             hasCountinue = false;
         }
     }
@@ -171,14 +193,12 @@ function startGame() {
     const randomNumArr = selectRandomNum();
     startBtn.removeEventListener("click", startGame);
     
-    // realLife = 1;
-    // realClearCount = 0;
     life.innerText = `life: ${realLife}`;
-    clearImgCount.innerText = `Clear: ${realClearCount}`;
+    clearCount.innerText = `Clear: ${realClearCount}`;
 
     viewEveryImg(randomNumArr);
     pushKeyStorage(randomNumArr);
-    viewImgDefault()
+    viewImgDefault(true)
     .then(() =>{
         addEventImg();
     });
